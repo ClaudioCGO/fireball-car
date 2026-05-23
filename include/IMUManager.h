@@ -40,9 +40,6 @@ public:
         current_yaw += gz * dt;
     }
 
-
-
-
     float getAccelX () const { return ax; }
     float getAccelY () const { return ay; }
     float getAccelZ () const { return az; }

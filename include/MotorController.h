@@ -26,8 +26,8 @@ public:
 
     void move(float left_coef, float right_coef) {
         // Apply the difference in one wrong motor
-        left_coef *= Config::LEFT_MOTOR_TRIM;
-        right_coef *= Config::RIGHT_MOTOR_TRIM;
+        left_coef *= Tuning::LEFT_MOTOR_TRIM;
+        right_coef *= Tuning::RIGHT_MOTOR_TRIM;
 
         setMotor(left_coef, Pins::LEFT_MOTOR_IN1, Pins::LEFT_MOTOR_IN2, Pins::LEFT_MOTOR_PWM);
         setMotor(right_coef, Pins::RIGHT_MOTOR_IN1, Pins::RIGHT_MOTOR_IN2, Pins::RIGHT_MOTOR_PWM);

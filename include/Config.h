@@ -1,9 +1,7 @@
 #pragma once
-#include <Arduino.h>
 
 // ============================================================================
 // PINS CONFIGURATION (Hardware Layout)
-// ============================================================================
 namespace Pins {
     // H-Bridge and Motors
     constexpr uint8_t HB_STANDBY = 3;
@@ -28,8 +26,7 @@ namespace Pins {
 
 // ============================================================================
 // PERFORMANCE TUNING (Change often during tests)
-// ============================================================================
-namespace Config {
+namespace Tuning {
     // --- Motor balancing (Trim) ---
     // If the car drifts slightly left on a straight, lower RIGHT_MOTOR_TRIM (e.g. 0.95)
     // If it drifts slightly right, lower LEFT_MOTOR_TRIM.
@@ -53,7 +50,6 @@ namespace Config {
 
 // ============================================================================
 // SYSTEM CONSTANTS (Set once, do not change unless hardware changes)
-// ============================================================================
 namespace Config {
     // Sensor Logic Hardware Check
     // Set to HIGH if sensor outputs HIGH on Black. Set to LOW if it outputs LOW on Black.
@@ -70,4 +66,21 @@ namespace Config {
     static constexpr float ACCEL_SCALE = 16384.0f;      // For range: +-2g
     static constexpr float ACCEL_SMOOTH_ALPHA = 0.2f;   // Lower = smoother but slower response
     static constexpr float DEADZONE_THRESHOLD = 1.2f;   // Filters out small stationary sensor ticks
+}
+
+
+// ============================================================================
+// MACHINE LEARNING & BOOST SETTINGS
+namespace ML {
+    // Data Gathering
+    constexpr int MAX_SAMPLES = 1000;                   // 1000 samples = ~12KB of SRAM
+    constexpr unsigned long SAMPLE_INTERVAL_MS = 30;    // 30ms * 1000 = 30 seconds of recording time
+
+    // Training Hyperparameters
+    constexpr float LEARNING_RATE = 0.05f;              // Step size for Gradient Descent
+    constexpr int TRAINING_EPOCHS = 100;                // How many times to loop over the data at the finish line
+
+    // Racing Logic
+    constexpr float CONFIDENCE_THRESHOLD = 0.85f;       // Requires 85% safety probability to trigger boost
+    constexpr int BOOST_SPEED = 255;                    // Max speed injected on straightaways
 }
