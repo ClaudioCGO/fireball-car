@@ -12,7 +12,7 @@ public:
         if (!BMI160.begin(BMI160GenClass::I2C_MODE, Config::BMI160_I2C_ADDR)) {
             return false;
         }
-        previous_time = millis();
+        previous_time = micros();
         return true;
     }
 
@@ -23,8 +23,9 @@ public:
         BMI160.readAccelerometer(raw_ax, raw_ay, raw_az);
         BMI160.readGyro(raw_gx, raw_gy, raw_gz);
 
-        unsigned long current_time = millis();
-        float dt = (current_time - previous_time) * 1000.0f;
+        unsigned long current_time = micros();
+
+        float dt = (current_time - previous_time) * 1000000.0f;
         previous_time = current_time;
 
         ax = applySmoothing((float)raw_ax / Config::ACCEL_SCALE, ax);
@@ -47,7 +48,7 @@ public:
     float getAccelZ () const { return az; }
 
     float getGyroX () const { return gx; }
-    float getGyroy () const { return gy; }
+    float getGyroY () const { return gy; }
     float getGyroZ () const { return gz; }
 
     float getYaw () const { return current_yaw; }
