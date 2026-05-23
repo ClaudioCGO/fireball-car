@@ -12,7 +12,7 @@ LineSensor sensors;
 LineFollower fireball(motors, imu, sensors);
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   delay(100);
 
   Wire.begin(Pins::I2C_SDA, Pins::I2C_SCL);
@@ -23,11 +23,17 @@ void setup() {
     while(1);
   }
 
+  Serial.println("Firmware Fireball v0.03 initiated successfully");
+
+  Serial.println("Place car on the line! Starting in 3 seconds...");
+  delay(3000);
+
   fireball.begin();
-  Serial.println("Firmware Fireball v0.02 initiated successfully");
+  Serial.println("GO!");
 }
 
 void loop() {
   imu.update();
   fireball.update();
+  delay(1);
 }
