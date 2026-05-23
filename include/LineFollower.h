@@ -3,6 +3,8 @@
 #include "MotorController.h"
 #include "IMUManager.h"
 #include "LineSensor.h"
+#include "DataGathering.h"
+#include "LogisticRegression.h"
 
 class LineFollower {
 public:
@@ -11,7 +13,12 @@ public:
     LineFollower(MotorController &m, IMUManager &i, LineSensor &s) 
         : motors(m), imu(i), sensors(s), 
         current_state(FOLLOWING), target_yaw(0.0f),
-         execution_beginning_time(0), last_line_seen(0), last_line_time(0) {}
+        execution_beginning_time(0), last_line_seen(0), last_line_time(0),
+        lap_count(1) {}
+
+    DataGatherer gatherer;
+    LogisticRegression ml_model;
+    int lap_count;
 
     void begin() {
         motors.begin();
@@ -20,14 +27,13 @@ public:
     }
 
     void update() {
-        if (current_state == WAITING) return;
-
         SensorState line = sensors.read();
 
         switch (current_state) {
         case FOLLOWING: followProcess(line.left_on_line, line.right_on_line); break;
         case CROSSING: crossProcess(line.left_on_line, line.right_on_line); break;
         case SEARCHING: searchProcess(line.left_on_line, line.right_on_line); break;
+        case WAITING: waitingProcess(); break;
         default: break;
         }
     }
@@ -56,35 +62,58 @@ private:
 
 
     void followProcess(bool left_black, bool right_black) {
+        float current_label;
+
+        // Two Sensors active
         if (left_black && right_black) {
+            
+            // Lap end check
             unsigned long total_race_time = millis() - execution_beginning_time;
-              
-            if (total_race_time > Config::LAP_END_SAFEGUARD_MS) {
+
+            if (total_race_time > Tuning::LAP_END_SAFEGUARD_MS) {
+                motors.hardBrake();    
                 current_state = WAITING;
-                motors.hardBrake();
+                lap_count++;
                 return;
-            } else {
+            } 
+
+            else {
                 current_state == CROSSING;
                 target_yaw = imu.getYaw();
                 crossing_start_time = millis();
-            }            
+                current_label = 1.0f;
+            }
         }
+
+        // No Sensors active
         else if (!left_black && !right_black) {
-            motors.move(Config::SPEED_STRAIGHT, Config::SPEED_STRAIGHT);
-            
-            if (millis() - last_line_time > Config::LOST_LINE_TIMEOUT_MS) {
+            motors.move(Tuning::SPEED_STRAIGHT, Tuning::SPEED_STRAIGHT);
+            current_label = 1.0f;
+
+            if (millis() - last_line_time > Tuning::LOST_LINE_TIMEOUT_MS) {
                 current_state = SEARCHING;
             }
         }
+
+        // Only Left Sensor active
         else if (left_black && !right_black) {
             last_line_seen = -1;
             last_line_time = millis();
-            motors.move(-Config::SPEED_CURVE, Config::SPEED_CURVE);
+            motors.move(-Tuning::SPEED_CURVE, Tuning::SPEED_CURVE);
+            current_label = 0.0f;
         }
+
+        // Only Right Sensor active
         else if (!left_black && right_black) {
             last_line_seen = 1;
             last_line_time = millis();
-            motors.move(Config::SPEED_CURVE, -Config::SPEED_CURVE);
+            motors.move(Tuning::SPEED_CURVE, -Tuning::SPEED_CURVE);
+            current_label = 0.0f;
+        }
+        
+        // Record the info
+        if (!gatherer.isFull() && (lap_count == 1)) {
+            gatherer.record(imu.getAccelX(), imu.getGyroZ(), current_label);
         }
     }
 
@@ -92,12 +121,12 @@ private:
         unsigned long time_in_cross = millis() - crossing_start_time;
 
         float error = target_yaw - imu.getYaw();
-        float fix = error * Config::KP_GYRO;
+        float fix = error * Tuning::KP_GYRO;
         
         // May need to invert the -+
-        motors.move(Config::SPEED_CROSSROAD - fix, Config::SPEED_CROSSROAD + fix);
+        motors.move(Tuning::SPEED_CROSSROAD - fix, Tuning::SPEED_CROSSROAD + fix);
 
-        if (time_in_cross > Config::CROSSING_TIMEOUT_MS) {
+        if (time_in_cross > Tuning::CROSSING_TIMEOUT_MS) {
             current_state = FOLLOWING;
             last_line_time = millis();
         }
@@ -109,8 +138,12 @@ private:
             last_line_time = millis();
         }
         else {
-            if (last_line_seen == -1) motors.move(-Config::SPEED_CURVE, Config::SPEED_CURVE);
-            else if (last_line_seen == 1) motors.move(-Config::SPEED_CURVE, Config::SPEED_CURVE);
+            if (last_line_seen == -1) motors.move(-Tuning::SPEED_CURVE, Tuning::SPEED_CURVE);
+            else if (last_line_seen == 1) motors.move(-Tuning::SPEED_CURVE, Tuning::SPEED_CURVE);
         }
+    }
+
+    void waitingProcess() {
+        // botar logica de treino e teste. esperar para recomeçar
     }
 };
