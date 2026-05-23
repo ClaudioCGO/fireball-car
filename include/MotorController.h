@@ -8,12 +8,15 @@ public:
 
     void begin() {
         pinMode(Pins::HB_STANDBY, OUTPUT);
+
         pinMode(Pins::LEFT_MOTOR_IN1, OUTPUT);
         pinMode(Pins::LEFT_MOTOR_IN2, OUTPUT);
         pinMode(Pins::LEFT_MOTOR_PWM, OUTPUT);
+        
         pinMode(Pins::RIGHT_MOTOR_IN1, OUTPUT);
         pinMode(Pins::RIGHT_MOTOR_IN2, OUTPUT);
-        pinMode(Pins::LEFT_MOTOR_PWM, OUTPUT);
+        pinMode(Pins::RIGHT_MOTOR_PWM, OUTPUT);
+        
         setStandby(false);
     }
 
@@ -22,54 +25,43 @@ public:
     }
 
     void move(float left_coef, float right_coef) {
-        // Apply the difference in one wrong motor ( dont know wich)
-        //left_coef = Config::MOTOR_POWER_DIFF * right_coef;
-        setStandby(false);
+        // Apply the difference in one wrong motor
+        left_coef *= Config::LEFT_MOTOR_TRIM;
+        right_coef *= Config::RIGHT_MOTOR_TRIM;
 
-        setMotorLeft(left_coef);
-        setMotorRight(right_coef);
-
-        setStandby(true);
+        setMotor(left_coef, Pins::LEFT_MOTOR_IN1, Pins::LEFT_MOTOR_IN2, Pins::LEFT_MOTOR_PWM);
+        setMotor(right_coef, Pins::RIGHT_MOTOR_IN1, Pins::RIGHT_MOTOR_IN2, Pins::RIGHT_MOTOR_PWM);
     }
 
-    void brake() {
-        setStandby(false);
-
-        digitalWrite(Pins::LEFT_MOTOR_IN1, LOW);
-        digitalWrite(Pins::LEFT_MOTOR_IN2, LOW);
+    void hardBrake() {
+        digitalWrite(Pins::LEFT_MOTOR_IN1, HIGH);
+        digitalWrite(Pins::LEFT_MOTOR_IN2, HIGH);
         analogWrite(Pins::LEFT_MOTOR_PWM, 0);
 
-        digitalWrite(Pins::RIGHT_MOTOR_IN1, LOW);
-        digitalWrite(Pins::RIGHT_MOTOR_IN2, LOW);
-        analogWrite(Pins::RIGHT_MOTOR_PWM, 0);
-
-        setStandby(true);
+        digitalWrite(Pins::RIGHT_MOTOR_IN1, HIGH);
+        digitalWrite(Pins::RIGHT_MOTOR_IN2, HIGH);
+        analogWrite(Pins::RIGHT_MOTOR_PWM, Config::PWM_MAX);
     }
 
 private:
-    void setMotorLeft(float coeficient) {
+    void setMotor(float coeficient, uint8_t in1_pin, uint8_t in2_pin, uint8_t pwm_pin) {
         coeficient = constrain(coeficient, -1.0f, 1.0f);
-        if (coeficient >= 0) {
-            digitalWrite(Pins::LEFT_MOTOR_IN1, HIGH);
-            digitalWrite(Pins::LEFT_MOTOR_IN2, LOW);
-        } else {
-            digitalWrite(Pins::LEFT_MOTOR_IN1, LOW);
-            digitalWrite(Pins::LEFT_MOTOR_IN2, HIGH);
+
+        if (coeficient == 0.0f) {
+            digitalWrite(in1_pin, LOW);
+            digitalWrite(in2_pin, LOW);
+            analogWrite(pwm_pin, 0);
+            return;
         }
 
-        analogWrite(Pins::LEFT_MOTOR_PWM, round(abs(coeficient) * Config::PWM_MAX));
-    }
-
-    void setMotorRight(float coeficient) {
-        coeficient = constrain(coeficient, -1.0f, 1.0f);
-        if (coeficient >= 0) {
-            digitalWrite(Pins::RIGHT_MOTOR_IN1, HIGH);
-            digitalWrite(Pins::RIGHT_MOTOR_IN2, LOW);
+        if (coeficient > 0) {
+            digitalWrite(in1_pin, HIGH);
+            digitalWrite(in2_pin, LOW);
         } else {
-            digitalWrite(Pins::RIGHT_MOTOR_IN1, LOW);
-            digitalWrite(Pins::RIGHT_MOTOR_IN2, HIGH);
+            digitalWrite(in1_pin, LOW);
+            digitalWrite(in2_pin, HIGH);
         }
 
-        analogWrite(Pins::RIGHT_MOTOR_PWM, round(abs(coeficient) * Config::PWM_MAX));
+        analogWrite(pwm_pin, static_cast<int>(abs(coeficient) * Config::PWM_MAX));
     }
 };

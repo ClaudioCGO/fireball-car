@@ -36,6 +36,12 @@ namespace Config {
 
     static constexpr float DEADZONE_THRESHOLD = 1.2f;
 
+
+    const float LEFT_MOTOR_TRIM = 1.0;
+    const float RIGHT_MOTOR_TRIM = 1.0;
+
+    static const uint8_t LINE_DETECT_STATE = HIGH;
+
     // Speeds
     const float SPEED_STRAIGHT = 0.50;
     const float SPEED_CURVE = 0.75;
@@ -44,7 +50,7 @@ namespace Config {
     const float MOTOR_POWER_DIFF = 1.0;
 
     // GYR PID
-    //const float KP_GYRO = 0.015;
+    const float KP_GYRO = 0.015;
     //const float KI_GYRO = 0.000;
     //const float KP_GYRO = 0.005;
     //const float MAX_INTEGRAL_GYRO = 10.0;
@@ -55,5 +61,7 @@ namespace Config {
     //const float KP_LINE = 0.15;
     //const float MAX_INTEGRAL_LINE = 5.0;
 
+    const unsigned long LOST_LINE_TIMEOUT_MS = 150;
+    const unsigned long CROSSING_TIMEOUT_MS = 50;
     const unsigned long LAP_END_SAFEGUARD_MS = 30000;
 }
