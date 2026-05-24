@@ -60,8 +60,8 @@ Modify the following variables based on your physical testing.
 Adjust these when the robot does not track straight or drifts.
 
 * `Tuning::LEFT_MOTOR_TRIM` / `Tuning::RIGHT_MOTOR_TRIM`: Calibration multipliers (0.0 to 1.0). Use to balance motor power.
-* `Tuning::SPEED_STRAIGHT`: Base velocity for straight segments.
-* `Tuning::SPEED_CURVE`: Base velocity for turns (lower than straight).
+* `Tuning::SPEED_STRAIGHT`: Base velocity normal segments.
+* `Tuning::SPEED_CURVE`: Base velocity Searching turns.
 * `Tuning::SPEED_CROSSROAD`: Velocity when navigating over a crossing gap.
 
 ### PID Controller Tuning

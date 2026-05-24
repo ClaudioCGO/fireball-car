@@ -34,8 +34,8 @@ namespace Tuning {
     constexpr float RIGHT_MOTOR_TRIM = 1.00f;
 
     // --- Target Speeds (From 0.00 to 1.00) ---
-    constexpr float SPEED_STRAIGHT = 0.50;  // Base speed down straightaways
-    constexpr float SPEED_CURVE = 0.75;     // Aggressiveness of correction turns
+    constexpr float SPEED_STRAIGHT = 0.50;  // Base speed 
+    constexpr float SPEED_CURVE = 0.75;     // Aggressiveness of searching turns
     constexpr float SPEED_CROSSROAD = 0.55; // Driving speed when blindly crossing gaps
 
     // --- Gyro Intersection Controller ---
