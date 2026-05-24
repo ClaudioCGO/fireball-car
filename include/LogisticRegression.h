@@ -16,12 +16,7 @@ public:
         
         //Shuffle with Fisher-Yates
         Serial.println("\n[ML] Shuffling dataset for better convergence...");
-        for (int i = num_samples; i > 0; i--) {
-            int j = random(0, i + 1);
-            TrainingSample temp = dataset[i];
-            dataset[i] = dataset[j];
-            dataset[j] = temp;
-        }
+        shuffleDataset(dataset, num_samples);
 
         Serial.println("\n[ML] Training Model...");
 
@@ -86,5 +81,14 @@ private:
     float sigmoid(float z) {
         z = constrain(z, -20.0f, 20.0f);
         return 1.0f / (1.0f + exp(-z));
+    }
+
+    void shuffleDataset(TrainingSample* dataset, int num_samples) {
+        for (int i = num_samples; i > 0; i--) {
+            int j = random(0, i + 1);
+            TrainingSample temp = dataset[i];
+            dataset[i] = dataset[j];
+            dataset[j] = temp;
+        }
     }
 };
