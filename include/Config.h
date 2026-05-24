@@ -41,10 +41,15 @@ namespace Tuning {
     // --- Gyro Intersection Controller ---
     constexpr float KP_GYRO = 0.015;        // Proportional correction weight for blind cross
 
+    static constexpr float KP_LINE = 50.0f;
+    static constexpr float KI_LINE = 0.0f;
+    static constexpr float KD_LINE = 10.0f;
+
     // --- Race Timers & Protection (Milliseconds) ---
     constexpr unsigned long LAP_END_SAFEGUARD_MS = 30000;   // Ignore finish line for 30s
     constexpr unsigned long CROSSING_TIMEOUT_MS = 50;       // Time spent blind-driving over crossroad
     constexpr unsigned long LOST_LINE_TIMEOUT_MS = 150;     // White/White timeout before SEARCHING state
+    constexpr unsigned long WAITING_TIME_MS = 10000;
 
     static const uint8_t DO_SECOND_LAP = 0;
 }
@@ -84,5 +89,5 @@ namespace ML {
 
     // Racing Logic
     constexpr float CONFIDENCE_THRESHOLD = 0.85f;       // Requires 85% safety probability to trigger boost
-    constexpr int BOOST_SPEED = 255;                    // Max speed injected on straightaways
+    constexpr float BOOST_SPEED = 1.0f;                    // Max speed injected on straightaways
 }

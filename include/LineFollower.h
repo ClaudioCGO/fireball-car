@@ -5,6 +5,7 @@
 #include "LineSensor.h"
 #include "DataGathering.h"
 #include "LogisticRegression.h"
+#include "SpeedController.h"
 
 class LineFollower {
 public:
@@ -14,15 +15,19 @@ public:
         : motors(m), imu(i), sensors(s), 
         current_state(FOLLOWING), target_yaw(0.0f),
         execution_beginning_time(0), last_line_seen(0), last_line_time(0),
-        lap_count(1) {}
+        lap_count(1),
+        pid(Tuning::KP_LINE, Tuning::KI_LINE, Tuning::KD_LINE),
+        trained_this_lap(false), wait_start_time(0) {}
 
     DataGatherer gatherer;
     LogisticRegression ml_model;
+    SpeedController pid;
     int lap_count;
 
     void begin() {
         motors.begin();
         sensors.begin();
+        pid.reset();
         execution_beginning_time = millis();
     }
 
@@ -60,9 +65,13 @@ private:
     unsigned long last_line_time;
     unsigned long crossing_start_time;
 
+    bool trained_this_lap;
+    unsigned long wait_start_time;
 
     void followProcess(bool left_black, bool right_black) {
         float current_label;
+        float base_speed = Tuning::SPEED_STRAIGHT;
+        float error = 0.0f;
 
         // Two Sensors active
         if (left_black && right_black) {
@@ -77,39 +86,49 @@ private:
             } 
 
             else {
-                current_state == CROSSING;
+                current_state = CROSSING;
                 target_yaw = imu.getYaw();
                 crossing_start_time = millis();
                 current_label = 1.0f;
             }
         }
 
-        // No Sensors active
-        else if (!left_black && !right_black) {
-            motors.move(Tuning::SPEED_STRAIGHT, Tuning::SPEED_STRAIGHT);
-            current_label = 1.0f;
-
-            if (millis() - last_line_time > Tuning::LOST_LINE_TIMEOUT_MS) {
-                current_state = SEARCHING;
-            }
-        }
-
         // Only Left Sensor active
         else if (left_black && !right_black) {
+            error = -1.0f;
             last_line_seen = -1;
             last_line_time = millis();
-            motors.move(-Tuning::SPEED_CURVE, Tuning::SPEED_CURVE);
             current_label = 0.0f;
         }
 
         // Only Right Sensor active
         else if (!left_black && right_black) {
+            error = 1.0f;
             last_line_seen = 1;
             last_line_time = millis();
-            motors.move(Tuning::SPEED_CURVE, -Tuning::SPEED_CURVE);
             current_label = 0.0f;
         }
         
+        // No Sensors active
+        else if (!left_black && !right_black) {
+            error = 0.0f;
+            current_label = 1.0f;
+
+            if (millis() - last_line_time > Tuning::LOST_LINE_TIMEOUT_MS) {
+                current_state = SEARCHING;
+            }
+
+            if (lap_count > 1) {
+                float safe_prob = ml_model.predict(imu.getAccelX(), imu.getGyroZ());
+                if (safe_prob >= ML::CONFIDENCE_THRESHOLD) {
+                    base_speed = ML::BOOST_SPEED;
+                }    
+            }
+        }
+        
+        float correction = pid.compute(error);
+        motors.move(base_speed + correction, base_speed - correction);
+
         // Record the info
         if (!gatherer.isFull() && (lap_count == 1)) {
             gatherer.record(imu.getAccelX(), imu.getGyroZ(), current_label);
@@ -128,6 +147,7 @@ private:
         if (time_in_cross > Tuning::CROSSING_TIMEOUT_MS) {
             current_state = FOLLOWING;
             last_line_time = millis();
+            pid.reset();
         }
     }
 
@@ -135,23 +155,33 @@ private:
         if (left_black || right_black) {
             current_state = FOLLOWING;
             last_line_time = millis();
+            pid.reset();
         }
         else {
             if (last_line_seen == -1) motors.move(-Tuning::SPEED_CURVE, Tuning::SPEED_CURVE);
-            else if (last_line_seen == 1) motors.move(-Tuning::SPEED_CURVE, Tuning::SPEED_CURVE);
+            else if (last_line_seen == 1) motors.move(Tuning::SPEED_CURVE, -Tuning::SPEED_CURVE);
         }
     }
 
     void waitingProcess() {
-        if (lap_count == 1) {
-            ml_model.train(gatherer.sample_data, gatherer.label_data, gatherer.sample_count);
-            ml_model.evaluate(gatherer.sample_data, gatherer.label_data, gatherer.sample_count, ML::CONFIDENCE_THRESHOLD);
+        if (!trained_this_lap) {
+            if (lap_count == 1) {
+                ml_model.train(gatherer.sample_data, gatherer.label_data, gatherer.sample_count);
+                ml_model.evaluate(gatherer.sample_data, gatherer.label_data, gatherer.sample_count, ML::CONFIDENCE_THRESHOLD);
+            }
+            trained_this_lap = true;
+            wait_start_time = millis();
         }
-        delay(10000);
+        
+        if(millis() - wait_start_time > Tuning::WAITING_TIME_MS) {
+            if (Tuning::DO_SECOND_LAP) {
+                lap_count++;
+                current_state = FOLLOWING;
+                trained_this_lap = false;
 
-        if (Tuning::DO_SECOND_LAP) {
-            lap_count++;
-            current_state = FOLLOWING;
+                pid.reset();
+                execution_beginning_time = millis();
+            }
         }
     }
 };
