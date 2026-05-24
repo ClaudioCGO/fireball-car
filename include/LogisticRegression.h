@@ -84,7 +84,7 @@ private:
     }
 
     void shuffleDataset(TrainingSample* dataset, int num_samples) {
-        for (int i = num_samples; i > 0; i--) {
+        for (int i = num_samples - 1; i > 0; i--) {
             int j = random(0, i + 1);
             TrainingSample temp = dataset[i];
             dataset[i] = dataset[j];
