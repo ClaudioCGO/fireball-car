@@ -50,6 +50,7 @@ namespace Tuning {
     constexpr unsigned long CROSSING_TIMEOUT_MS = 50;       // Time spent blind-driving over crossroad
     constexpr unsigned long LOST_LINE_TIMEOUT_MS = 150;     // White/White timeout before SEARCHING state
     constexpr unsigned long WAITING_TIME_MS = 10000;
+    constexpr unsigned long SEARCH_SAFETY_TIMEOUT_MS = 10000;
 
     static const uint8_t DO_SECOND_LAP = 0;
 }
@@ -73,6 +74,12 @@ namespace Config {
     static constexpr float ACCEL_SCALE = 16384.0f;      // For range: +-2g
     static constexpr float ACCEL_SMOOTH_ALPHA = 0.2f;   // Lower = smoother but slower response
     static constexpr float DEADZONE_THRESHOLD = 1.2f;   // Filters out small stationary sensor ticks
+
+    static constexpr float GYRO_NORM_FACTOR = 1000.0f;  // Normalize Gyro for the model
+    static constexpr float US_TO_SEC = 1000000.0f;
+
+    // Speed Controller Logic
+    static constexpr float PID_DT_FALLBACK = 0.001f;    // Minimal dt for first loop
 }
 
 

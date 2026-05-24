@@ -27,8 +27,8 @@ public:
         }
         
         unsigned long now = micros();
-        float dt = (now - last_time) / 1000000.0f;
-        if (dt <= 0.0f) dt = 0.001f;
+        float dt = (now - last_time) / Config::US_TO_SEC;
+        if (dt <= 0.0f) dt = Config::PID_DT_FALLBACK;
 
         integral += error * dt;
         float derivative = (error - previous_error) / dt;

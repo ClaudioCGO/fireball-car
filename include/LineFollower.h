@@ -115,7 +115,7 @@ private:
             }
 
             if (lap_count > 1) {
-                safe_prob = ml_model.predict(imu.getAccelX(), imu.getGyroZ() / 1000.0f);    
+                safe_prob = ml_model.predict(imu.getAccelX(), imu.getGyroZ() / Config::GYRO_NORM_FACTOR);    
             }
         }
         
@@ -125,7 +125,7 @@ private:
         motors.move(speeds.left, speeds.right);
 
         if (!gatherer.isFull() && (lap_count == 1)) {
-            gatherer.record(imu.getAccelX(), (imu.getGyroZ() / 1000.0f) , current_label);
+            gatherer.record(imu.getAccelX(), (imu.getGyroZ() / Config::GYRO_NORM_FACTOR) , current_label);
         }
     }
 
@@ -152,7 +152,7 @@ private:
             pid.reset();
         }
         else {
-            if (millis() - last_line_time > 10000) {
+            if (millis() - last_line_time > Tuning::SEARCH_SAFETY_TIMEOUT_MS) {
                 motors.setStandby(true);
             }
             
