@@ -35,5 +35,5 @@ void setup() {
 void loop() {
   imu.update();
   fireball.update();
-  delay(1);
+  yield();
 }
