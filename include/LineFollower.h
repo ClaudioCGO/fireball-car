@@ -69,28 +69,23 @@ private:
     unsigned long wait_start_time;
 
     void followProcess(bool left_black, bool right_black) {
-        float current_label;
-        float base_speed = Tuning::SPEED_STRAIGHT;
+        float current_label = 1.0f;
         float error = 0.0f;
+        float safe_prob = 0.0f;
 
         // Two Sensors active
         if (left_black && right_black) {
             
             // Lap end check
-            unsigned long total_race_time = millis() - execution_beginning_time;
-
-            if (total_race_time > Tuning::LAP_END_SAFEGUARD_MS) {
+            if ((millis() - execution_beginning_time) > Tuning::LAP_END_SAFEGUARD_MS) {
                 motors.hardBrake();    
                 current_state = WAITING;
-                return;
-            } 
-
-            else {
+            } else {
                 current_state = CROSSING;
                 target_yaw = imu.getYaw();
                 crossing_start_time = millis();
-                current_label = 1.0f;
             }
+            return;
         }
 
         // Only Left Sensor active
@@ -116,20 +111,19 @@ private:
 
             if (millis() - last_line_time > Tuning::LOST_LINE_TIMEOUT_MS) {
                 current_state = SEARCHING;
+                return;
             }
 
             if (lap_count > 1) {
-                float safe_prob = ml_model.predict(imu.getAccelX(), imu.getGyroZ());
-                if (safe_prob >= ML::CONFIDENCE_THRESHOLD) {
-                    base_speed = ML::BOOST_SPEED;
-                }    
+                safe_prob = ml_model.predict(imu.getAccelX(), imu.getGyroZ());    
             }
         }
         
-        float correction = pid.compute(error);
-        motors.move(base_speed + correction, base_speed - correction);
+        bool allow_turbo = (lap_count > 1 && error == 0.0f);
+        MotorSpeeds speeds = pid.compute(error, allow_turbo, safe_prob);
 
-        // Record the info
+        motors.move(speeds.left, speeds.right);
+
         if (!gatherer.isFull() && (lap_count == 1)) {
             gatherer.record(imu.getAccelX(), imu.getGyroZ(), current_label);
         }

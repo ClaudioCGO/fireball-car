@@ -19,21 +19,33 @@ public:
         last_time = micros();
     }
 
-    float compute(float error) {
+    MotorSpeeds compute(float error, bool allow_turbo, float safe_prob) {
+        float base_speed = Tuning::SPEED_STRAIGHT;
+
+        if (allow_turbo && safe_prob >= ML::CONFIDENCE_THRESHOLD) {
+            base_speed = ML::BOOST_SPEED;
+        }
+        
         unsigned long now = micros();
         float dt = (now - last_time) / 1000000.0f;
-
         if (dt <= 0.0f) dt = 0.001f;
 
         integral += error * dt;
         float derivative = (error - previous_error) / dt;
 
-        float output = (Kp * error) + (Ki * integral) + (Kd * derivative);
+        float correction = (Kp * error) + (Ki * integral) + (Kd * derivative);
 
         previous_error = error;
         last_time = now;
 
-        return output;
+        MotorSpeeds target;
+        target.left = base_speed + correction;
+        target.right = base_speed - correction;
+
+        target.left = constrain(target.left, -1.0f, 1.0f);
+        target.right = constrain(target.right, -1.0f, 1.0f);
+
+        return target;
     }
 
 private:

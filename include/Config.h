@@ -41,9 +41,9 @@ namespace Tuning {
     // --- Gyro Intersection Controller ---
     constexpr float KP_GYRO = 0.015;        // Proportional correction weight for blind cross
 
-    static constexpr float KP_LINE = 50.0f;
+    static constexpr float KP_LINE = 0.4f;
     static constexpr float KI_LINE = 0.0f;
-    static constexpr float KD_LINE = 10.0f;
+    static constexpr float KD_LINE = 0.05f;
 
     // --- Race Timers & Protection (Milliseconds) ---
     constexpr unsigned long LAP_END_SAFEGUARD_MS = 30000;   // Ignore finish line for 30s
