@@ -25,7 +25,7 @@ public:
 
         unsigned long current_time = micros();
 
-        float dt = (current_time - previous_time) * 1000000.0f;
+        float dt = (current_time - previous_time) / 1000000.0f;
         previous_time = current_time;
 
         ax = applySmoothing((float)raw_ax / Config::ACCEL_SCALE, ax);

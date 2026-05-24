@@ -22,7 +22,7 @@ public:
         SensorState state;
 
         state.left_on_line = (digitalRead(Pins::LEFT_IR_SENSOR) == Config::LINE_DETECT_STATE);
-        state.right_on_line = (digitalRead(Pins::RIGHT_IR_SENSOR == Config::LINE_DETECT_STATE));
+        state.right_on_line = (digitalRead(Pins::RIGHT_IR_SENSOR) == Config::LINE_DETECT_STATE);
 
         return state;
     }

@@ -19,8 +19,8 @@ public:
                 float error = prediction - labels[i];
                 
                 bias -= learning_rate * error;
-                weights[0] = learning_rate * error * sample_data[i][0];
-                weights[1] = learning_rate * error * sample_data[i][1];
+                weights[0] -= learning_rate * error * sample_data[i][0];
+                weights[1] -= learning_rate * error * sample_data[i][1];
             }
         }
         Serial.println("[ML] Training complete!");
