@@ -20,7 +20,7 @@ public:
     }
 
     MotorSpeeds compute(float error, bool allow_turbo, float safe_prob) {
-        float base_speed = Tuning::SPEED_STRAIGHT;
+        float base_speed = Tuning::BASE_SPEED;
 
         if (allow_turbo && safe_prob >= ML::CONFIDENCE_THRESHOLD) {
             base_speed = ML::BOOST_SPEED;
