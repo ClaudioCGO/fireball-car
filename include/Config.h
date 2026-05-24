@@ -92,7 +92,7 @@ namespace ML {
 
     // Training Hyperparameters
     constexpr float LEARNING_RATE = 0.05f;              // Step size for Gradient Descent
-    constexpr int TRAINING_EPOCHS = 100;                // How many times to loop over the data at the finish line
+    constexpr int TRAINING_EPOCHS = 200;                // How many times to loop over the data at the finish line
 
     // Racing Logic
     constexpr float CONFIDENCE_THRESHOLD = 0.85f;       // Requires 85% safety probability to trigger boost

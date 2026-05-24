@@ -115,7 +115,7 @@ private:
             }
 
             if (lap_count > 1) {
-                safe_prob = ml_model.predict(imu.getAccelX(), imu.getGyroZ() / Config::GYRO_NORM_FACTOR);    
+                safe_prob = ml_model.predict(abs(imu.getAccelX()), abs(imu.getGyroZ()) / Config::GYRO_NORM_FACTOR);    
             }
         }
         
@@ -125,7 +125,7 @@ private:
         motors.move(speeds.left, speeds.right);
 
         if (!gatherer.isFull() && (lap_count == 1)) {
-            gatherer.record(imu.getAccelX(), (imu.getGyroZ() / Config::GYRO_NORM_FACTOR) , current_label);
+            gatherer.record(abs(imu.getAccelX()), (abs(imu.getGyroZ()) / Config::GYRO_NORM_FACTOR) , current_label);
         }
     }
 
