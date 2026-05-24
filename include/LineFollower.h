@@ -73,7 +73,6 @@ private:
             if (total_race_time > Tuning::LAP_END_SAFEGUARD_MS) {
                 motors.hardBrake();    
                 current_state = WAITING;
-                lap_count++;
                 return;
             } 
 
@@ -144,6 +143,15 @@ private:
     }
 
     void waitingProcess() {
-        // botar logica de treino e teste. esperar para recomeçar
+        if (lap_count == 1) {
+            ml_model.train(gatherer.sample_data, gatherer.label_data, gatherer.sample_count);
+            ml_model.evaluate(gatherer.sample_data, gatherer.label_data, gatherer.sample_count, ML::CONFIDENCE_THRESHOLD);
+        }
+        delay(10000);
+
+        if (Tuning::DO_SECOND_LAP) {
+            lap_count++;
+            current_state = FOLLOWING;
+        }
     }
 };

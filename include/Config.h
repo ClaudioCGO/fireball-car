@@ -45,6 +45,8 @@ namespace Tuning {
     constexpr unsigned long LAP_END_SAFEGUARD_MS = 30000;   // Ignore finish line for 30s
     constexpr unsigned long CROSSING_TIMEOUT_MS = 50;       // Time spent blind-driving over crossroad
     constexpr unsigned long LOST_LINE_TIMEOUT_MS = 150;     // White/White timeout before SEARCHING state
+
+    static const uint8_t DO_SECOND_LAP = 0;
 }
 
 

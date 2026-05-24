@@ -9,10 +9,10 @@ public:
         for (int i = 0; i < NUM_FEATURES; i++) weights[i] = 0.0f;
     }
 
-    void train(float sample_data[][2], float* labels, int num_samples, int epochs) {
+    void train(float sample_data[][2], float* labels, int num_samples) {
         Serial.println("\n[ML] Training Model...");
 
-        for (int e = 0; e < epochs; e++) {
+        for (int e = 0; e < ML::TRAINING_EPOCHS; e++) {
             for (int i = 0; i < num_samples; i++) {
                 float z = bias + (weights[0] * sample_data[i][0]) +  (weights[1] * sample_data[i][1]);
                 float prediction = sigmoid(z);
