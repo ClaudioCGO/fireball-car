@@ -152,7 +152,11 @@ private:
             pid.reset();
         }
         else {
-            if (last_line_seen == -1) motors.move(-Tuning::SPEED_CURVE, Tuning::SPEED_CURVE);
+            if (millis() - last_line_time > 10000) {
+                motors.setStandby(true);
+            }
+            
+            else if (last_line_seen == -1) motors.move(-Tuning::SPEED_CURVE, Tuning::SPEED_CURVE);
             else if (last_line_seen == 1) motors.move(Tuning::SPEED_CURVE, -Tuning::SPEED_CURVE);
         }
     }
