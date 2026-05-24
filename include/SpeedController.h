@@ -31,6 +31,8 @@ public:
         if (dt <= 0.0f) dt = Config::PID_DT_FALLBACK;
 
         integral += error * dt;
+        integral = constrain(integral, -1.0f, 1.0f);
+
         float derivative = (error - previous_error) / dt;
 
         float correction = (Kp * error) + (Ki * integral) + (Kd * derivative);
