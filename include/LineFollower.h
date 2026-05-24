@@ -17,7 +17,8 @@ public:
         execution_beginning_time(0), last_line_seen(0), last_line_time(0),
         lap_count(1),
         pid(Tuning::KP_LINE, Tuning::KI_LINE, Tuning::KD_LINE),
-        trained_this_lap(false), wait_start_time(0) {}
+        trained_this_lap(false), wait_start_time(0),
+        straight_concecutive_cycles(0) {}
 
     DataGatherer gatherer;
     LogisticRegression ml_model;
@@ -68,6 +69,8 @@ private:
     bool trained_this_lap;
     unsigned long wait_start_time;
 
+    int straight_concecutive_cycles;
+
     void followProcess(bool left_black, bool right_black) {
         float current_label = 1.0f;
         float error = 0.0f;
@@ -75,6 +78,7 @@ private:
 
         // Two Sensors active
         if (left_black && right_black) {
+            //straight_concecutive_cycles = 0;
             
             // Lap end check
             if ((millis() - execution_beginning_time) > Tuning::LAP_END_SAFEGUARD_MS) {
@@ -94,6 +98,7 @@ private:
             last_line_seen = -1;
             last_line_time = millis();
             current_label = 0.0f;
+            straight_concecutive_cycles = 0;
         }
 
         // Only Right Sensor active
@@ -102,6 +107,7 @@ private:
             last_line_seen = 1;
             last_line_time = millis();
             current_label = 0.0f;
+            straight_concecutive_cycles = 0;
         }
         
         // No Sensors active
@@ -111,15 +117,24 @@ private:
 
             if (millis() - last_line_time > Tuning::LOST_LINE_TIMEOUT_MS) {
                 current_state = SEARCHING;
+                straight_concecutive_cycles = 0;
                 return;
             }
 
             if (lap_count > 1) {
                 safe_prob = ml_model.predict(abs(imu.getAccelX()), abs(imu.getGyroZ()) / Config::GYRO_NORM_FACTOR);    
+
+                //Temporal Filter
+                if (safe_prob >= ML::CONFIDENCE_THRESHOLD) {
+                    straight_concecutive_cycles++;
+                } else {
+                    straight_concecutive_cycles = 0;
+                }
             }
         }
         
-        bool allow_turbo = (lap_count > 1 && error == 0.0f);
+        
+        bool allow_turbo = (lap_count > 1 && error == 0.0f && straight_concecutive_cycles >= ML::MIN_CYCLES_TURBO);
         MotorSpeeds speeds = pid.compute(error, allow_turbo, safe_prob);
 
         motors.move(speeds.left, speeds.right);

@@ -97,4 +97,5 @@ namespace ML {
     // Racing Logic
     constexpr float CONFIDENCE_THRESHOLD = 0.85f;       // Requires 85% safety probability to trigger boost
     constexpr float BOOST_SPEED = 1.0f;                    // Max speed injected on straightaways
+    constexpr uint8_t MIN_CYCLES_TURBO = 5;
 }
