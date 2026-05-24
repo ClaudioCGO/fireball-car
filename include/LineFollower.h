@@ -3,7 +3,7 @@
 #include "MotorController.h"
 #include "IMUManager.h"
 #include "LineSensor.h"
-#include "DataGathering.h"
+#include "DataGatherer.h"
 #include "LogisticRegression.h"
 #include "SpeedController.h"
 

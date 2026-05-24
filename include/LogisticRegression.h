@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <math.h>
 #include "Config.h"
-#include "DataGathering.h"
+#include "DataGatherer.h"
 
 class LogisticRegression {
 public:
