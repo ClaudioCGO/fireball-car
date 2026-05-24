@@ -87,8 +87,8 @@ namespace Config {
 // MACHINE LEARNING & BOOST SETTINGS
 namespace ML {
     // Data Gathering
-    constexpr int MAX_SAMPLES = 1000;                   // 1000 samples = ~12KB of SRAM
-    constexpr unsigned long SAMPLE_INTERVAL_MS = 30;    // 30ms * 1000 = 30 seconds of recording time
+    constexpr int MAX_SAMPLES = 2500;                   // 2500 samples = ~30KB of SRAM
+    constexpr unsigned long SAMPLE_INTERVAL_MS = 30;    // 30ms * 2500 = 75 seconds of recording time
 
     // Training Hyperparameters
     constexpr float LEARNING_RATE = 0.05f;              // Step size for Gradient Descent
