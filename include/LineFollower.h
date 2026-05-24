@@ -164,8 +164,8 @@ private:
     void waitingProcess() {
         if (!trained_this_lap) {
             if (lap_count == 1) {
-                ml_model.train(gatherer.sample_data, gatherer.label_data, gatherer.sample_count);
-                ml_model.evaluate(gatherer.sample_data, gatherer.label_data, gatherer.sample_count, ML::CONFIDENCE_THRESHOLD);
+                ml_model.train(gatherer.getDataSet(), gatherer.getSampleCount());
+                ml_model.evaluate(gatherer.getDataSet(), gatherer.getSampleCount(), ML::CONFIDENCE_THRESHOLD);
             }
             trained_this_lap = true;
             wait_start_time = millis();
