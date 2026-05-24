@@ -35,7 +35,7 @@ public:
     void hardBrake() {
         digitalWrite(Pins::LEFT_MOTOR_IN1, HIGH);
         digitalWrite(Pins::LEFT_MOTOR_IN2, HIGH);
-        analogWrite(Pins::LEFT_MOTOR_PWM, 0);
+        analogWrite(Pins::LEFT_MOTOR_PWM, Config::PWM_MAX);
 
         digitalWrite(Pins::RIGHT_MOTOR_IN1, HIGH);
         digitalWrite(Pins::RIGHT_MOTOR_IN2, HIGH);
