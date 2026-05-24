@@ -33,7 +33,14 @@ void setup() {
 }
 
 void loop() {
-  imu.update();
-  fireball.update();
+  static unsigned long last_loop = 0;
+  
+  if (micros() - last_loop >= 2000) { // Fixa o loop em 500Hz (2ms)
+    last_loop = micros();
+    
+    imu.update();
+    fireball.update();
+  }
+  
   yield();
 }

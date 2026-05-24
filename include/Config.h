@@ -64,7 +64,7 @@ namespace Config {
     static const uint8_t LINE_DETECT_STATE = HIGH;
 
     // I2C Configuration
-    constexpr int I2C_SPEED_HZ = 100000;
+    constexpr int I2C_SPEED_HZ = 400000;    // 400KHz
     constexpr int BMI160_I2C_ADDR = 0x69;
 
 
