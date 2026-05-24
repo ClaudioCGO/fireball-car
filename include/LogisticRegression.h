@@ -21,6 +21,7 @@ public:
         Serial.println("\n[ML] Training Model...");
 
         for (int e = 0; e < ML::TRAINING_EPOCHS; e++) {
+
             for (int i = 0; i < num_samples; i++) {
                 float z = bias + (weights[0] * dataset[i].accel_x) +  (weights[1] * dataset[i].gyro_z);
                 float prediction = sigmoid(z);
@@ -31,6 +32,8 @@ public:
                 weights[0] -= learning_rate * error * dataset[i].accel_x;
                 weights[1] -= learning_rate * error * dataset[i].gyro_z;
             }
+
+            delay(1);
         }
         Serial.println("[ML] Training complete!");
         Serial.printf("[ML] Weights: W1=%.4f, W2=%.4f, Bias=%.4f\n", weights[0], weights[1], bias);
