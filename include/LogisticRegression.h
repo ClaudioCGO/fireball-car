@@ -11,7 +11,18 @@ public:
         weights[1] = 0.0f;
     }
 
-    void train(const TrainingSample* dataset, int num_samples) {
+    void train(TrainingSample* dataset, int num_samples) {
+        if (num_samples == 0) return;
+        
+        //Shuffle with Fisher-Yates
+        Serial.println("\n[ML] Shuffling dataset for better convergence...");
+        for (int i = num_samples; i > 0; i--) {
+            int j = random(0, i + 1);
+            TrainingSample temp = dataset[i];
+            dataset[i] = dataset[j];
+            dataset[j] = temp;
+        }
+
         Serial.println("\n[ML] Training Model...");
 
         for (int e = 0; e < ML::TRAINING_EPOCHS; e++) {

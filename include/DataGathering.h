@@ -26,7 +26,7 @@ public:
 
     bool isFull() const { return sample_count >= ML::MAX_SAMPLES; }
     int getSampleCount() const { return sample_count; }
-    const TrainingSample* getDataSet() { return dataset; }
+    TrainingSample* getDataSet() { return dataset; }
 
 private:
     TrainingSample dataset[ML::MAX_SAMPLES];
