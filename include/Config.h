@@ -48,6 +48,7 @@ namespace Tuning {
     static constexpr float KD_LINE = 0.05f;
 
     // --- Race Timers & Protection (Milliseconds) ---
+    constexpr unsigned long STARTING_DELAY_MS = 3000;       // Delay before the car starts
     constexpr unsigned long LAP_END_SAFEGUARD_MS = 30000;   // Ignore finish line for 30s
     constexpr unsigned long CROSSING_TIMEOUT_MS = 50;       // Time spent blind-driving over crossroad
     constexpr unsigned long LOST_LINE_TIMEOUT_MS = 500;     // White/White timeout before SEARCHING state
