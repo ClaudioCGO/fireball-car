@@ -10,7 +10,7 @@ namespace Pins {
     constexpr uint8_t LEFT_MOTOR_IN2 = 20;
     constexpr uint8_t LEFT_MOTOR_PWM = 10;
     
-    constexpr uint8_t RIGHT_MOTOR_IN1 = 1; // this and the bellow pin are physically switched(?).
+    constexpr uint8_t RIGHT_MOTOR_IN1 = 1;
     constexpr uint8_t RIGHT_MOTOR_IN2 = 2;
     constexpr uint8_t RIGHT_MOTOR_PWM = 0;
 
@@ -19,8 +19,10 @@ namespace Pins {
     constexpr uint8_t I2C_SCL = 9;
 
     // IR Line Sensors
-    constexpr uint8_t LEFT_IR_SENSOR = 6;
-    constexpr uint8_t RIGHT_IR_SENSOR = 7;    
+    constexpr uint8_t OUTER_LEFT_IR_SENSOR = 99;
+    constexpr uint8_t INNER_LEFT_IR_SENSOR = 6;
+    constexpr uint8_t INNER_RIGHT_IR_SENSOR = 7;
+    constexpr uint8_t OUTER_RIGHT_IR_SENSOR = 98;
 }
 
 
@@ -35,8 +37,8 @@ namespace Tuning {
 
     // --- Target Speeds (From 0.00 to 1.00) ---
     constexpr float BASE_SPEED = 0.50;  // Base speed 
-    constexpr float SPEED_CURVE = 0.75;     // Aggressiveness of searching turns
-    constexpr float SPEED_CROSSROAD = 0.55; // Driving speed when blindly crossing gaps
+    constexpr float CURVE_SPEED = 0.75;     // Aggressiveness of searching turns
+    constexpr float CROSSROAD_SPEED = 0.55; // Driving speed when blindly crossing gaps
 
     // --- Gyro Intersection Controller ---
     constexpr float KP_GYRO = 0.015;        // Proportional correction weight for blind cross
@@ -48,7 +50,7 @@ namespace Tuning {
     // --- Race Timers & Protection (Milliseconds) ---
     constexpr unsigned long LAP_END_SAFEGUARD_MS = 30000;   // Ignore finish line for 30s
     constexpr unsigned long CROSSING_TIMEOUT_MS = 50;       // Time spent blind-driving over crossroad
-    constexpr unsigned long LOST_LINE_TIMEOUT_MS = 150;     // White/White timeout before SEARCHING state
+    constexpr unsigned long LOST_LINE_TIMEOUT_MS = 500;     // White/White timeout before SEARCHING state
     constexpr unsigned long WAITING_TIME_MS = 10000;
     constexpr unsigned long SEARCH_SAFETY_TIMEOUT_MS = 10000;
 
@@ -96,6 +98,6 @@ namespace ML {
 
     // Racing Logic
     constexpr float CONFIDENCE_THRESHOLD = 0.85f;       // Requires 85% safety probability to trigger boost
-    constexpr float BOOST_SPEED = 1.0f;                    // Max speed injected on straightaways
-    constexpr uint8_t MIN_CYCLES_TURBO = 5;
+    constexpr float BOOST_SPEED = 1.0f;                 // Max speed injected on straightaways
+    constexpr uint8_t MIN_CYCLES_TURBO = 5;             // Minimum cycles required to run on turbo
 }

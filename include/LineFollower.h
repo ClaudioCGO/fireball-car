@@ -151,7 +151,7 @@ private:
         float fix = error * Tuning::KP_GYRO;
         
         // May need to invert the -+
-        motors.move(Tuning::SPEED_CROSSROAD - fix, Tuning::SPEED_CROSSROAD + fix);
+        motors.move(Tuning::CROSSROAD_SPEED - fix, Tuning::CROSSROAD_SPEED + fix);
 
         if (time_in_cross > Tuning::CROSSING_TIMEOUT_MS) {
             current_state = FOLLOWING;
@@ -171,8 +171,8 @@ private:
                 motors.setStandby(true);
             }
             
-            else if (last_line_seen == -1) motors.move(-Tuning::SPEED_CURVE, Tuning::SPEED_CURVE);
-            else if (last_line_seen == 1) motors.move(Tuning::SPEED_CURVE, -Tuning::SPEED_CURVE);
+            else if (last_line_seen == -1) motors.move(-Tuning::CURVE_SPEED, Tuning::CURVE_SPEED);
+            else if (last_line_seen == 1) motors.move(Tuning::CURVE_SPEED, -Tuning::CURVE_SPEED);
         }
     }
 
