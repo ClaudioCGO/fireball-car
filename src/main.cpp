@@ -23,7 +23,7 @@ void setup() {
     while(1);
   }
 
-  Serial.println("Firmware Fireball v0.06 initiated successfully");
+  Serial.println("Firmware Fireball v0.1 initiated successfully");
 
   Serial.printf("Place car on the line! Starting in %.1f seconds...\n", (Tuning::STARTING_DELAY_MS / 1000.0));
   delay(Tuning::STARTING_DELAY_MS);

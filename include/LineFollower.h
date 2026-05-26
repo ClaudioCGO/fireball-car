@@ -36,9 +36,9 @@ public:
         SensorState line = sensors.read();
 
         switch (current_state) {
-        case FOLLOWING: followProcess(line.left_on_line, line.right_on_line); break;
-        case CROSSING: crossProcess(line.left_on_line, line.right_on_line); break;
-        case SEARCHING: searchProcess(line.left_on_line, line.right_on_line); break;
+        case FOLLOWING: followProcess(line.inner_left_on_line, line.inner_right_on_line); break;
+        case CROSSING: crossProcess(line.inner_left_on_line, line.inner_right_on_line); break;
+        case SEARCHING: searchProcess(line.inner_left_on_line, line.inner_right_on_line); break;
         case WAITING: waitingProcess(); break;
         default: break;
         }
