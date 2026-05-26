@@ -103,98 +103,87 @@ private:
                 break;
             
             case 0b0010:
+                current_error = 0.6f;
+                last_line_seen = 1;
+                break;
             
-        }
+            case 0b1100:
+                current_error = -1.5f;
+                last_line_seen = -1;
+                break;
 
-
-
-        /*
-
-
-        // Two Sensors active
-        if (left_black && right_black) {
-            //straight_concecutive_cycles = 0;
+            case 0b0011:
+                current_error = 1.5f;
+                last_line_seen = 1;
+                break;
             
+            case 0b1000:
+                current_error = -2.0f;
+                last_line_seen = -1;
+                break;
             
-            } else {
-                current_state = CROSSING;
-                target_yaw = imu.getYaw();
-                crossing_start_time = millis();
-            }
-            return;
-        }
+            case 0b0001:
+                current_error = 2.0f;
+                last_line_seen = 1;
+                break;
 
-        // Only Left Sensor active
-        else if (left_black && !right_black) {
-            current_error = -1.0f;
-            last_line_seen = -1;
-            last_line_time = millis();
-            current_label = 0.0f;
-            straight_concecutive_cycles = 0;
-        }
-
-        // Only Right Sensor active
-        else if (!left_black && right_black) {
-            current_error = 1.0f;
-            last_line_seen = 1;
-            last_line_time = millis();
-            current_label = 0.0f;
-            straight_concecutive_cycles = 0;
-        }
-        
-        // No Sensors active
-        else if (!left_black && !right_black) {
-            current_error = 0.0f;
-            current_label = 1.0f;
-
-            if (millis() - last_line_time > Tuning::LOST_LINE_TIMEOUT_MS) {
-                current_state = SEARCHING;
-                straight_concecutive_cycles = 0;
-                return;
-            }
-
-            if (lap_count > 1) {
-                safe_prob = ml_model.predict(abs(imu.getAccelX()), abs(imu.getGyroZ()) / Config::GYRO_NORM_FACTOR);    
-
-                //Temporal Filter
-                if (safe_prob >= ML::CONFIDENCE_THRESHOLD) {
-                    straight_concecutive_cycles++;
-                } else {
+            case 0b0000:
+                if (millis() - last_line_time > Tuning::LOST_LINE_TIMEOUT_MS) {
+                    current_state = SEARCHING;
                     straight_concecutive_cycles = 0;
+                    return;
                 }
-            }
+
+                if (lap_count > 1) {
+                    safe_prob = ml_model.predict(abs(imu.getAccelX()), abs(imu.getGyroZ()) / Config::GYRO_NORM_FACTOR);
+                    if (safe_prob >= ML::CONFIDENCE_THRESHOLD) {
+                        straight_concecutive_cycles++;
+                    } else {
+                        straight_concecutive_cycles = 0;
+                    }
+                }
+                
+                break;
+            
+            default: 
+                break;
         }
-        
-        
+
+        if (sensor_mask != 0b0110 && sensor_mask != 0b0000) {
+            last_line_time = millis();
+            current_label = 0.0f; // Indica curva para a coleta de dados
+            straight_concecutive_cycles = 0;
+        }
+
         bool allow_turbo = (lap_count > 1 && current_error == 0.0f && straight_concecutive_cycles >= ML::MIN_CYCLES_TURBO);
         MotorSpeeds speeds = pid.compute(current_error, allow_turbo, safe_prob);
-
         motors.move(speeds.left, speeds.right);
 
         if (!gatherer.isFull() && (lap_count == 1)) {
-            gatherer.record(abs(imu.getAccelX()), (abs(imu.getGyroZ()) / Config::GYRO_NORM_FACTOR) , current_label);
+            gatherer.record(abs(imu.getAccelX()), (abs(imu.getGyroZ()) / Config::GYRO_NORM_FACTOR), current_label);
         }
-        */
     }
 
 
 
     void searchProcess(const SensorState& line) {
-        /*
-        if (left_black || right_black) {
+        
+        if (line.inner_left_on_line || line.inner_right_on_line) {
             current_state = FOLLOWING;
             last_line_time = millis();
             pid.reset();
         }
-        else {
-            if (millis() - last_line_time > Tuning::SEARCH_SAFETY_TIMEOUT_MS) {
-                motors.setStandby(true);
-            }
-            
-            else if (last_line_seen == -1) motors.move(-Tuning::CURVE_SPEED, Tuning::CURVE_SPEED);
-            else if (last_line_seen == 1) motors.move(Tuning::CURVE_SPEED, -Tuning::CURVE_SPEED);
+
+        if (line.inner_left_on_line || line.inner_right_on_line) {
+            current_state = FOLLOWING;
+            last_line_time = millis();
+            pid.reset();
         }
-        */
+
+        else {
+            float turn = (last_line_seen == 1) ? Tuning::CURVE_SPEED : -Tuning::CURVE_SPEED;
+            motors.move(turn, -turn);
+        }
     }
 
     void waitingProcess() {
