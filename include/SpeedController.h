@@ -20,10 +20,10 @@ public:
     }
 
     MotorSpeeds compute(float error, bool allow_turbo, float safe_prob) {
-        float base_speed = Tuning::BASE_SPEED;
+        float speed = Tuning::BASE_SPEED;
 
         if (allow_turbo && safe_prob >= ML::CONFIDENCE_THRESHOLD) {
-            base_speed = ML::BOOST_SPEED;
+            speed = ML::BOOST_SPEED;
         }
         
         unsigned long now = micros();
@@ -41,8 +41,8 @@ public:
         last_time = now;
 
         MotorSpeeds target;
-        target.left = base_speed + correction;
-        target.right = base_speed - correction;
+        target.left = speed + correction;
+        target.right = speed - correction;
 
         target.left = constrain(target.left, -1.0f, 1.0f);
         target.right = constrain(target.right, -1.0f, 1.0f);
