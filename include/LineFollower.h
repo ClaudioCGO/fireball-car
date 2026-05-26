@@ -83,11 +83,12 @@ private:
             if ((millis() - execution_beginning_time) > Tuning::LAP_END_SAFEGUARD_MS) {
                 motors.hardBrake();    
                 current_state = WAITING;
-                return;
             } 
             
             // Go blind for a bit
             last_intersection_time = millis();
+            motors.move(Tuning::CROSSROAD_SPEED, Tuning::CROSSROAD_SPEED);
+            return;
         }
 
         switch (sensor_mask) {
@@ -168,12 +169,6 @@ private:
 
     void searchProcess(const SensorState& line) {
         
-        if (line.inner_left_on_line || line.inner_right_on_line) {
-            current_state = FOLLOWING;
-            last_line_time = millis();
-            pid.reset();
-        }
-
         if (line.inner_left_on_line || line.inner_right_on_line) {
             current_state = FOLLOWING;
             last_line_time = millis();

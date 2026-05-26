@@ -30,8 +30,13 @@ public:
         float dt = (now - last_time) / Config::US_TO_SEC;
         if (dt <= 0.0f) dt = Config::PID_DT_FALLBACK;
 
-        integral += error * dt;
-        integral = constrain(integral, -1.0f, 1.0f);
+
+        if (error == 0.0f) {
+            integral = 0.0f;
+        } else {
+            integral += error * dt;
+            integral = constrain(integral, -1.0f, 1.0f);
+        }
 
         float derivative = (error - previous_error) / dt;
 
